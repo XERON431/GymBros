@@ -7,7 +7,7 @@ const About: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ paddingTop: '50px' }}>
       <Typography variant="h2" align="center" gutterBottom>
-        About GymBroses
+        About GymBros
       </Typography>
       <Typography variant="body1" align="center" paragraph>
         Welcome to GymBros, your ultimate gym companion!
