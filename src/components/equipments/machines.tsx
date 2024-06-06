@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Typography, List, ListItem, ListItemText, Box } from '@mui/material';
+import React, { useState } from "react";
+import { Typography, List, ListItem, ListItemText, Box } from "@mui/material";
+import CustomModal from "../modals/Modal";
 
 interface Machine {
   name: string;
@@ -11,6 +12,7 @@ interface Category {
 }
 
 const StrengthTrainingMachines: React.FC = () => {
+  const [machineModalOpen, setMachineModalOpen] = useState(false);
   const categories: Category[] = [
     {
       name: "Upper Body",
@@ -53,7 +55,7 @@ const StrengthTrainingMachines: React.FC = () => {
     {
       name: "Core",
       machines: [
-        { name: "Abdominal Crunch Machine" },
+        { name: "Abdominal Crunch Machines" },
         { name: "Roman Chair" },
         { name: "Cable Woodchopper" },
       ],
@@ -80,34 +82,44 @@ const StrengthTrainingMachines: React.FC = () => {
     }
   };
 
+  const handleMachineModalClose = () => {
+    setMachineModalOpen((prevState) => !prevState);
+  };
+
   return (
     <div>
       {categories.map((category, index) => (
-       
         <Box key={index}>
-  {/* Category name with red text color */}
-  <Typography
-    variant="h6"
-    color={expandedCategory === category.name ? "primary" : "initial"}
-    onClick={() => toggleExpansion(category.name)}
-    style={{ cursor: "pointer", fontWeight: "bold" }} // Add fontWeight: "bold" here
-  >
-    {category.name}
-  </Typography>
-  {/* List of machines with black text color */}
-     {expandedCategory === category.name && (
+          {/* Category name with red text color */}
+          <Typography
+            variant="h6"
+            color={expandedCategory === category.name ? "primary" : "initial"}
+            onClick={() => toggleExpansion(category.name)}
+            style={{ cursor: "pointer", fontWeight: "bold" }} // Add fontWeight: "bold" here
+          >
+            {category.name}
+          </Typography>
+          {/* List of machines with black text color */}
+          {expandedCategory === category.name && (
             <List>
               {category.machines.map((machine, index) => (
                 <ListItem key={index}>
-                  <ListItemText primary={machine.name} primaryTypographyProps={{ color: 'black' }} />
+                  <ListItemText
+                    primary={machine.name}
+                    primaryTypographyProps={{ color: "black" }}
+                    onClick={handleMachineModalClose}
+                  />
                 </ListItem>
               ))}
             </List>
           )}
-</Box>
-
-        
+        </Box>
       ))}
+      <CustomModal
+        open={machineModalOpen}
+        handleClose={handleMachineModalClose}
+        title="AI Image"
+      ></CustomModal>
     </div>
   );
 };
