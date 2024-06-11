@@ -1,113 +1,105 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, List, ListItem, ListItemText, Box } from "@mui/material";
 import CustomModal from "../modals/Modal";
+import AddExerciseForm from "../../components/forms/AddExerciseForm";
 
-interface Machine {
+interface Exercise {
   name: string;
+  category: string;
+  sets: number;
+  reps: number;
 }
 
 interface Category {
   name: string;
-  machines: Machine[];
+  exercises: Exercise[];
 }
 
 const StrengthTrainingMachines: React.FC = () => {
-  const [machineModalOpen, setMachineModalOpen] = useState(false);
-  const categories: Category[] = [
-    {
-      name: "Upper Body",
-      machines: [
-        { name: "Bench Press" },
-        { name: "Chest Fly Machine" },
-        { name: "Pull-Up Bar" },
-        { name: "Lat Pulldown Machine" },
-        { name: "SEATED BICEP (Preacher curl)" },
-        { name: "ISO-LATERAL BICEPS CURL" },
-        { name: "BICEPS CURL - INSIGNIA SERIES" },
-        { name: "SHOULDER PRESS" },
-        { name: "ISO-LATERAL INCLINE PRESS" },
-        { name: "ISO-LATERAL HORIZONTAL BENCH PRESS" },
-        { name: "TRICEPS PRESS" },
-        { name: "ISO-LATERAL WIDE PULLDOWN" },
-        { name: "ROW MACHINE" },
-        { name: "ISO-LATERAL WIDE CHEST PRESS" },
-        { name: "PECTORAL FLY/REAR DELTOID" },
-        { name: "LATERAL RAISE" },
-        { name: "T BAR ROW" },
-        { name: "ISO-LATERAL SHOULDER PRESS" },
-        { name: "ISO-LATERAL ROW" },
-        { name: "CHEST PRESS" },
-        { name: "ISO-LATERAL BENCH PRESS" },
-        { name: "PECTORAL FLY/REAR DELTOID" },
-        { name: "ISO-LATERAL LOW ROW" },
-        { name: "ISO-LATERAL FRONT LAT PULLDOWN" },
-      ],
-    },
-    {
-      name: "Lower Body",
-      machines: [
-        { name: "Leg Press Machine" },
-        { name: "Squat Rack" },
-        { name: "Leg Extension Machine" },
-        { name: "Leg Curl Machine" },
-      ],
-    },
-    {
-      name: "Core",
-      machines: [
-        { name: "Abdominal Crunch Machines" },
-        { name: "Roman Chair" },
-        { name: "Cable Woodchopper" },
-      ],
-    },
-    {
-      name: "Full Body",
-      machines: [
-        { name: "Smith Machine" },
-        { name: "Rowing Machine" },
-        { name: "Cable Crossover Machine" },
-      ],
-    },
-  ];
-
-  // State to track which category is currently expanded
+  const [exerciseModalOpen, setExerciseModalOpen] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-  // Function to toggle expansion of categories
-  const toggleExpansion = (categoryName: string) => {
-    if (expandedCategory === categoryName) {
-      setExpandedCategory(null); // Collapse if already expanded
+  useEffect(() => {
+    fetchExercises();
+  }, []);
+
+  const fetchExercises = async () => {
+    const response = await fetch('/api/exercises');
+    const result = await response.json();
+    if (result.success) {
+      const fetchedCategories: Category[] = result.data.reduce((acc: Category[], exercise: Exercise) => {
+        const categoryIndex = acc.findIndex((cat) => cat.name === exercise.category);
+        if (categoryIndex !== -1) {
+          acc[categoryIndex].exercises.push(exercise);
+        } else {
+          acc.push({ name: exercise.category, exercises: [exercise] });
+        }
+        return acc;
+      }, []);
+      setCategories(fetchedCategories);
     } else {
-      setExpandedCategory(categoryName); // Expand if not expanded
+      console.error(result.error);
     }
   };
 
-  const handleMachineModalClose = () => {
-    setMachineModalOpen((prevState) => !prevState);
+  const handleExerciseModalClose = () => {
+    setExerciseModalOpen(false);
+  };
+
+  const handleExerciseClick = (exercise: Exercise) => {
+    setSelectedExercise(exercise);
+    setExerciseModalOpen(true);
+  };
+
+  const handleExerciseAdded = (newExercise: Exercise) => {
+    const categoryIndex = categories.findIndex((cat) => cat.name === newExercise.category);
+    if (categoryIndex !== -1) {
+      const updatedCategories = [...categories];
+      updatedCategories[categoryIndex].exercises.push(newExercise);
+      setCategories(updatedCategories);
+    } else {
+      setCategories([...categories, { name: newExercise.category, exercises: [newExercise] }]);
+    }
+  };
+
+  const toggleExpansion = (categoryName: string) => {
+    if (expandedCategory === categoryName) {
+      setExpandedCategory(null); 
+    } else {
+      setExpandedCategory(categoryName); 
+    }
   };
 
   return (
     <div>
+      <AddExerciseForm onExerciseAdded={handleExerciseAdded} />
       {categories.map((category, index) => (
         <Box key={index}>
-          {/* Category name with red text color */}
           <Typography
             variant="h6"
             color={expandedCategory === category.name ? "primary" : "initial"}
             onClick={() => toggleExpansion(category.name)}
-            style={{ cursor: "pointer", fontWeight: "bold" }} // Add fontWeight: "bold" here
-          >
+            style={{ cursor: "pointer", fontWeight: "bold" }}
+          > 
             {category.name}
           </Typography>
-          {/* List of machines with black text color */}
           {expandedCategory === category.name && (
             <List>
-              {category.machines.map((machine, index) => (
-                <ListItem key={index}>
+              {category.exercises.map((exercise, index) => (
+                <ListItem 
+                  key={index} 
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                    },
+                  }}
+                >
                   <ListItemText
-                    primary={machine.name}
+                    primary={`${exercise.name} - Sets: ${exercise.sets}, Reps: ${exercise.reps}`}
                     primaryTypographyProps={{ color: "black" }}
-                    onClick={handleMachineModalClose}
+                    onClick={() => handleExerciseClick(exercise)}
                   />
                 </ListItem>
               ))}
@@ -116,9 +108,9 @@ const StrengthTrainingMachines: React.FC = () => {
         </Box>
       ))}
       <CustomModal
-        open={machineModalOpen}
-        handleClose={handleMachineModalClose}
-        title="AI Image"
+        open={exerciseModalOpen}
+        handleClose={handleExerciseModalClose}
+        title={selectedExercise ? selectedExercise.name : ""}
       ></CustomModal>
     </div>
   );
