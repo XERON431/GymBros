@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography, List, ListItem, ListItemText, Box } from "@mui/material";
 import CustomModal from "../modals/Modal";
-import AddExerciseForm from "../../components/forms/AddExerciseForm";
+import AddExerciseForm from "../forms/AddExerciseForm";
 
 interface Exercise {
   name: string;
@@ -111,7 +111,17 @@ const StrengthTrainingMachines: React.FC = () => {
         open={exerciseModalOpen}
         handleClose={handleExerciseModalClose}
         title={selectedExercise ? selectedExercise.name : ""}
-      ></CustomModal>
+        fullscreen={false} // or true, depending on your needs
+      >
+        {/* Optionally, you can add modal content here */}
+        {selectedExercise && (
+          <Box>
+            <Typography variant="body1">
+              Exercise Details: Sets - {selectedExercise.sets}, Reps - {selectedExercise.reps}
+            </Typography>
+          </Box>
+        )}
+      </CustomModal>
     </div>
   );
 };
