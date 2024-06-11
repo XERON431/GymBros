@@ -15,6 +15,9 @@ const Header: React.FC = () => {
                     <Link href="/">Home</Link>
                 </Button>
                 <Button color="inherit">
+                    <Link href="/machines">Machines</Link>
+                </Button>
+                <Button color="inherit">
                     <Link href="/about">About</Link>
                 </Button>
                 <Button color="inherit">

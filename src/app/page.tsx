@@ -4,9 +4,6 @@ import {
   Typography,
   Container,
   Box,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
 import StrengthTrainingMachines from "@/components/equipments/machines";
 
