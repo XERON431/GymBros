@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import connectDB from '../../../utils/db';
 import Exercise from '../../../models/Exercise';
 
@@ -13,7 +14,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   await connectDB();
   try {
     const body = await req.json();
