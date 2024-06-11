@@ -1,4 +1,3 @@
-// app/api/exercises/route.js
 import { NextResponse } from 'next/server';
 import connectDB from '../../../utils/db';
 import Exercise from '../../../models/Exercise';
@@ -9,7 +8,8 @@ export async function GET() {
     const exercises = await Exercise.find({});
     return NextResponse.json({ success: true, data: exercises });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message });
+    const err = error as Error;
+    return NextResponse.json({ success: false, error: err.message });
   }
 }
 
@@ -21,6 +21,7 @@ export async function POST(req) {
     await exercise.save();
     return NextResponse.json({ success: true, data: exercise });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message });
+    const err = error as Error;
+    return NextResponse.json({ success: false, error: err.message });
   }
 }
