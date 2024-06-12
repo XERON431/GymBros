@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Typography, List, ListItem, ListItemText, Box } from "@mui/material";
+import { Typography, List, ListItem, ListItemText, Box, CircularProgress } from "@mui/material";
 import CustomModal from "../modals/Modal";
 import AddExerciseForm from "../forms/AddExerciseForm";
 
@@ -20,27 +20,35 @@ const StrengthTrainingMachines: React.FC = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);  // State to track loading
 
   useEffect(() => {
     fetchExercises();
   }, []);
 
   const fetchExercises = async () => {
-    const response = await fetch('/api/exercises');
-    const result = await response.json();
-    if (result.success) {
-      const fetchedCategories: Category[] = result.data.reduce((acc: Category[], exercise: Exercise) => {
-        const categoryIndex = acc.findIndex((cat) => cat.name === exercise.category);
-        if (categoryIndex !== -1) {
-          acc[categoryIndex].exercises.push(exercise);
-        } else {
-          acc.push({ name: exercise.category, exercises: [exercise] });
-        }
-        return acc;
-      }, []);
-      setCategories(fetchedCategories);
-    } else {
-      console.error(result.error);
+    setLoading(true);  // Start loading
+    try {
+      const response = await fetch('/api/exercises');
+      const result = await response.json();
+      if (result.success) {
+        const fetchedCategories: Category[] = result.data.reduce((acc: Category[], exercise: Exercise) => {
+          const categoryIndex = acc.findIndex((cat) => cat.name === exercise.category);
+          if (categoryIndex !== -1) {
+            acc[categoryIndex].exercises.push(exercise);
+          } else {
+            acc.push({ name: exercise.category, exercises: [exercise] });
+          }
+          return acc;
+        }, []);
+        setCategories(fetchedCategories);
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);  // Stop loading
     }
   };
 
@@ -66,54 +74,59 @@ const StrengthTrainingMachines: React.FC = () => {
 
   const toggleExpansion = (categoryName: string) => {
     if (expandedCategory === categoryName) {
-      setExpandedCategory(null); 
+      setExpandedCategory(null);
     } else {
-      setExpandedCategory(categoryName); 
+      setExpandedCategory(categoryName);
     }
   };
 
   return (
     <div>
       <AddExerciseForm onExerciseAdded={handleExerciseAdded} />
-      {categories.map((category, index) => (
-        <Box key={index}>
-          <Typography
-            variant="h6"
-            color={expandedCategory === category.name ? "primary" : "initial"}
-            onClick={() => toggleExpansion(category.name)}
-            style={{ cursor: "pointer", fontWeight: "bold" }}
-          > 
-            {category.name}
-          </Typography>
-          {expandedCategory === category.name && (
-            <List>
-              {category.exercises.map((exercise, index) => (
-                <ListItem 
-                  key={index} 
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: '#f0f0f0',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={`${exercise.name} - Sets: ${exercise.sets}, Reps: ${exercise.reps}`}
-                    primaryTypographyProps={{ color: "black" }}
-                    onClick={() => handleExerciseClick(exercise)}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          )}
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+          <CircularProgress />
         </Box>
-      ))}
+      ) : (
+        categories.map((category, index) => (
+          <Box key={index}>
+            <Typography
+              variant="h6"
+              color={expandedCategory === category.name ? "primary" : "initial"}
+              onClick={() => toggleExpansion(category.name)}
+              style={{ cursor: "pointer", fontWeight: "bold" }}
+            >
+              {category.name}
+            </Typography>
+            {expandedCategory === category.name && (
+              <List>
+                {category.exercises.map((exercise, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: '#f0f0f0',
+                      },
+                    }}
+                  >
+                    <ListItemText
+                      primary={`${exercise.name} - Sets: ${exercise.sets}, Reps: ${exercise.reps}`}
+                      primaryTypographyProps={{ color: "black" }}
+                      onClick={() => handleExerciseClick(exercise)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Box>
+        ))
+      )}
       <CustomModal
         open={exerciseModalOpen}
         handleClose={handleExerciseModalClose}
         title={selectedExercise ? selectedExercise.name : ""}
-        fullscreen={false} // or true, depending on your needs
+        fullscreen={false}
       >
-        {/* Optionally, you can add modal content here */}
         {selectedExercise && (
           <Box>
             <Typography variant="body1">

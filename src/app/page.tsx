@@ -34,7 +34,7 @@ const Home: React.FC = () => {
           fontWeight="bold"
           sx={{ marginBottom: 2 }}
         >
-          List of Gym Machiness
+          List of Gym Machines
         </Typography>
         {/* List of gym machines */}
         <StrengthTrainingMachines />
