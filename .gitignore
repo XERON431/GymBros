@@ -26,10 +26,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
-
-# Local environment files
 .env
+.env.local
 
 # vercel
 .vercel
@@ -38,4 +36,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# misc files
 Username.docx

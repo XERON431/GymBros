@@ -1,4 +1,3 @@
-// components/AddExerciseForm.js
 import React, { useState } from "react";
 import { Box, Button, TextField, MenuItem } from "@mui/material";
 
@@ -20,12 +19,29 @@ const AddExerciseForm = ({ onExerciseAdded }) => {
 
     if (!exerciseName || !category || !sets || !reps) return;
 
+    const currentDate = new Date();
+    const day = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+    const date = currentDate.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    console.log("date", date)
+    console.log("day", day)
+
     const response = await fetch('/api/exercises', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: exerciseName, category, sets: Number(sets), reps: Number(reps) })
+      body: JSON.stringify({
+        name: exerciseName,
+        category,
+        sets: Number(sets),
+        reps: Number(reps),
+        day,
+        date
+      })
     });
 
     const result = await response.json();
