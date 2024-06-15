@@ -28,6 +28,9 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# Local environment files
+.env
+
 # vercel
 .vercel
 
@@ -36,4 +39,3 @@ yarn-error.log*
 next-env.d.ts
 
 Username.docx
-.env
