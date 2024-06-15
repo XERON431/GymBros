@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const exercise = new Exercise(body);
+    console.log(exercise)
     await exercise.save();
     return NextResponse.json({ success: true, data: exercise });
   } catch (error) {

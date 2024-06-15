@@ -17,6 +17,14 @@ const ExerciseSchema = new mongoose.Schema({
   reps: {
     type: Number,
     required: true
+  },
+  day: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
   }
 });
 
